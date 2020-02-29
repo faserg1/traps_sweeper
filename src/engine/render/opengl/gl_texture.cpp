@@ -84,7 +84,11 @@ namespace engine::render::opengl
 		{
 			switch (type.toInt()) {
 			case DataType::F32:
+				#ifdef EMSCRIPTEN
 				return GL_RGBA32F;
+				#else
+				return GL_RGBA32F;
+				#endif
 			case DataType::U8:
 				return GL_RGBA8;
 			default:
@@ -137,7 +141,7 @@ namespace engine::render::opengl
 
 	void GPUTexture::resizeAndClear(i32 w, i32 h) // clears data!
 	{
-		checkError();
+		checkError(1);
 		//console::out("texture resize");
 		_impl->_w = w;
 		_impl->_h = h;
@@ -154,11 +158,11 @@ namespace engine::render::opengl
 			toGLEnum(params.dataType),
 			nullptr
 		);
-		checkError();
+		checkError(2);
 		if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST) {
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
-		checkError();
+		checkError(3);
 	}
 	void GPUTexture::write(const byte* bytes)
 	{

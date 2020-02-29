@@ -10,6 +10,8 @@ namespace engine::env
 	{
 		auto flags = IMG_INIT_JPG | IMG_INIT_PNG;
 		auto result = IMG_Init(flags);
+		if (!result)
+			std::cerr << "SDL_image could not initialize! SDL_image Error: " << IMG_GetError() << "\n";
 		assert((result & flags));
 	}
 

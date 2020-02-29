@@ -3,5 +3,5 @@
 
 namespace engine::render::opengl
 {
-	void checkError();
+	void checkError(int line = -1);
 }
