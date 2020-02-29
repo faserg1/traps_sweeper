@@ -49,6 +49,7 @@ namespace fs = std::filesystem;
 
 using namespace engine;
 
+#ifndef EMSCRIPTEN
 extern "C"
 {
 	// request dedicated graphics for nvidia
@@ -56,6 +57,7 @@ extern "C"
 	// request dedicated graphics for amd
 	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
+#endif
 
 
 int main(int argc, char* argv[]) {

@@ -84,7 +84,7 @@ namespace engine::render {
 			if (requiredByteSize > writeTexture.byteSize()) {
 				f32 totalPixels = ElemsPerSlot * _capacity / 4.0f;
 				f32 dim = math::sqrt(totalPixels);
-				f32 w = static_cast<f32>(math::toNextPowOf2(math::toInt(math::max(dim, ElemsPerSlot / 4))));
+				f32 w = static_cast<f32>(math::toNextPowOf2(math::toInt(math::max(dim, static_cast<f32>(ElemsPerSlot / 4)))));
 				f32 h = math::ceil(totalPixels / w);
 				writeTexture.resizeAndClear(math::toInt(w), math::toInt(h));
 			}

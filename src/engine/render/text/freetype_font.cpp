@@ -1,8 +1,13 @@
 #include "freetype_font.h"
 #include "utf.h"
+#ifdef EMSCRIPTEN
+#include <ft2build.h>
+#include <ftglyph.h>
+#else
+#include <ft2build.h>
+#include <freetype/ftglyph.h>
+#endif
 
-#include "ft2build.h"
-#include "freetype/ftglyph.h"
 #include FT_FREETYPE_H
 
 #include <iostream>

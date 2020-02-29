@@ -2,6 +2,8 @@
 #include "vec3.h"
 #include "quat.h"
 
+#include <cmath>
+
 namespace engine::matrix
 {
 	//TODO: SIMD 

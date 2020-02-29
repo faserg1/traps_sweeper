@@ -20,7 +20,7 @@ namespace engine::render
 	class TypeAggregate {
 	public:
 		static i64 totalSize(i32 count) {
-			return totalSizeImpl<Ts...>() * count;
+			return (Ts::size() + ...) * count;
 		}
 		template <typename T>
 		static i64 getOffset(i32 count) {
@@ -28,7 +28,7 @@ namespace engine::render
 			return getOffsetImpl<T, Ts...>() * count;
 		}
 	private:
-		template <typename T, typename... Ts>
+		/*template <typename T, typename... Ts>
 		constexpr static i64 totalSizeImpl(i64 size = 0) {
 			size += T::size();
 			if constexpr (sizeof...(Ts) > 0) {
@@ -37,13 +37,13 @@ namespace engine::render
 			else {
 				return size;
 			}
-		}
-		template <typename Target, typename T, typename... Ts>
+		}*/
+		template <typename Target, typename T, typename... Ts2>
 		constexpr static i64 getOffsetImpl(i64 offset = 0) {
 			if constexpr (std::is_same_v<Target, T>) { return offset; }
 			else {
 				offset += T::size();
-				return getOffsetImpl<Target, Ts...>(offset);
+				return getOffsetImpl<Target, Ts2...>(offset);
 			}
 		}
 	};

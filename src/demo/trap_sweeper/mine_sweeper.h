@@ -226,7 +226,7 @@ namespace sweeper {
 		i32 _markedMines = 0;
 		i32 _explored = 0;
 
-		template <i32 W, i32 H>
+		template <i32 Wb, i32 Hb>
 		class BoardButtons;
 	};
 

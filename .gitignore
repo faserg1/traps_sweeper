@@ -1,0 +1,10 @@
+#IDE
+.vs
+.vscode
+
+#Build artifacts
+bin
+em_build
+
+#Misc
+.emsdk_path

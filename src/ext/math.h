@@ -1,5 +1,6 @@
 #pragma once
 #include "src/basic_types.h"
+#include <cmath>
 
 namespace engine::math
 {
