@@ -56,7 +56,7 @@ namespace engine::render::opengl
 				glGetShaderInfoLog(shader, charLength, NULL, &str[0]);
 
 				std::cout << str.c_str() << "\n";
-				std::cout << *source;
+				std::cout << *source << std::endl;
 				throw;
 				return 0;
 			}

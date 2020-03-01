@@ -35,6 +35,7 @@ namespace engine::render {
 		struct Results {
 			VarList inputs = {};
 			VarList outputs = {};
+			Lines headerLines = {};
 			Lines setupLines = {};
 			Lines lines = {};
 		};
@@ -100,7 +101,6 @@ namespace engine::render {
 					//r.lines.push_back(var.glType + " " + var.name + ";");
 				//}
 			}
-
 			r.lines.push_back(source);
 			if (!node.setup.empty()) {
 				r.setupLines.push_back(node.setup);
@@ -123,7 +123,10 @@ namespace engine::render {
 		};
 		str_t compileSrc(Results& results) {
 			Lines vSrc = {};
-
+			for (auto& line : results.headerLines) {
+				vSrc.push_back(line);
+			}
+			
 			for (auto& in : results.inputs) {
 				str_t tag = "";
 				switch (in.usage) {
@@ -162,9 +165,9 @@ namespace engine::render {
 				vSrc.push_back(line);
 			}
 			vSrc.push_back("}");
-
-			auto r = string::join(vSrc, "\n");
-
+			
+			auto r = string::join(vSrc, "\r\n");
+			
 			return r;
 		};
 
@@ -201,6 +204,11 @@ namespace engine::render {
 		}
 
 		ShaderGen::ShaderResult generate(ShaderNode& vertexNode, ShaderNode& fragNode) {
+			#ifdef EMSCRIPTEN
+			vStuff.headerLines.push_back("#version 100");
+			fStuff.headerLines.push_back("#version 100");
+			fStuff.headerLines.push_back("precision highp float;");
+			#endif
 			processNodes(vertexNode, SHADER::VERTEX);
 			processNodes(fragNode, SHADER::FRAGMENT);
 			auto r = ShaderGen::ShaderResult {

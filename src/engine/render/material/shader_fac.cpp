@@ -46,7 +46,7 @@ R"(mat4 read_matrix(float modelIndex, sampler2D texture, vec2 invTextureWH){
 	vec4 third = texture2D(texture, uv + shift*2.0);
 	vec4 fourth = texture2D(texture, uv + shift*3.0);
 	return mat4(first, second, third, fourth);	
-};)";
+})";
 			modelNode.source =
 R"(mat4 u_model = read_matrix(a_mIndex, u_transforms, u_transformsInvWH);
 vec4 model_pos = u_model * vec4(a_pos, 1.0);)";
@@ -69,7 +69,7 @@ vec4 read_vec4(float slotIndex, sampler2D texture, vec2 invTextureWH){
 		(row + 0.5)*invTextureWH.y
 	);
 	return vec4(texture2D(texture, uv));
-};)";
+})";
 			modelNode.source =
 				R"(vec4 model_pos = vec4(a_pos, 1.0) + vec4(read_vec4(a_mIndex, u_translations, u_translationsInvWH).xyz, 0.0);)";
 
@@ -109,7 +109,7 @@ vec4 read_vec4(float slotIndex, sampler2D texture, vec2 invTextureWH){
 		(row + 0.5)*invTextureWH.y
 	);
 	return texture2D(texture, uv);
-};)";
+})";
 			using namespace fmt::literals;
 			
 			colorNode.source = 
