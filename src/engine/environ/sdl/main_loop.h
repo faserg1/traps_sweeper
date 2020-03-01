@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <functional>
+#include <chrono>
 #include "src/basic_types.h"
 
 namespace engine::sdl
@@ -25,5 +26,9 @@ namespace engine::sdl
 	private:
 		struct Impl;
 		std::unique_ptr<Impl> _impl = {};
+		std::chrono::time_point<std::chrono::steady_clock> prevTick;
+	private:
+		static void tickOuter(void *arg);
+		void tick();
 	};
 }

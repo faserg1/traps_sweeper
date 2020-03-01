@@ -3,6 +3,7 @@
 #ifdef EMSCRIPTEN
 #include <ft2build.h>
 #include <ftglyph.h>
+#include "src/engine/environ/emcc_wget.h"
 #else
 #include <ft2build.h>
 #include <freetype/ftglyph.h>
@@ -18,26 +19,47 @@ namespace engine::render {
 	struct FreeTypeFont::Impl {
 		Impl(str_ref filePath, i32 pointSize) {
 			if (FT_Init_FreeType(&library)) {
+				std::cerr << "Failed to init freetype" << std::endl;
 				throw;
 			}
-
+			#ifdef EMSCRIPTEN
+			std::cout << "Try to load file " << filePath.c_str() << std::endl;
+			/*auto fData = env::loadFileAsync(filePath.c_str());
+			if (!fData.valid()) {
+				std::cerr << "Unable to load file!" << std::endl;
+				throw;
+			}
+			auto data = fData.get();*/
+			auto data = env::loadFile(filePath.c_str());
+			auto error = FT_New_Memory_Face(
+				library,
+				static_cast<const unsigned char *>(std::get<0>(*data)),
+				std::get<1>(*data),
+				0,
+				&face
+			);
+			// FT_Error error = 1;
+			#else
 			auto error = FT_New_Face(
 				library,
 				filePath.c_str(),
 				0,
 				&face
 			);
+			#endif
 			if (error) {
 				if (error == FT_Err_Unknown_File_Format) {
-					std::cout << "Unknown file format.";
+					std::cerr << "Unknown file format." << std::endl;
 				}
 				else {
+					std::cerr << "Unknown error " << error << std::endl;
 					throw;
 				}
 			}
 			
 			
 			if (FT_Set_Pixel_Sizes(face, 0, pointSize)) {
+				std::cerr << "Failed to set pixel size" << std::endl;
 				throw;
 			}
 
@@ -47,7 +69,7 @@ namespace engine::render {
 				m.descender / 64,
 				m.ascender / 64
 			};
-
+			std::cout << "Font " << filePath << " has been loaded." << std::endl;
 		}
 		~Impl() {
 			FT_Done_Face(face);
