@@ -5,6 +5,7 @@
 #include <GL/glew.h>
 #include "error_handling.h"
 #include <cassert>
+#include <iostream>
 
 //#include "src/engine/utils/console.h"
 
@@ -40,8 +41,10 @@ namespace engine::render::opengl
 	GLenum toGLEnum(TextureParams::Format format) {
 		switch (format) {
 		case TextureParams::Format::RGBA:
+			std::cout << "Choosed GL_RGBA.\n";
 			return GL_RGBA;
 		default:
+			std::cout << "Fuck. What format?\n";
 			throw;
 		}
 	}
@@ -85,18 +88,22 @@ namespace engine::render::opengl
 			switch (type.toInt()) {
 			case DataType::F32:
 				#ifdef EMSCRIPTEN
+				std::cout << "Chosed GL_RGBA32F\n";
 				return GL_RGBA32F;
 				#else
 				return GL_RGBA32F;
 				#endif
 			case DataType::U8:
+				std::cout << "Chosed GL_RGBA8\n";
 				return GL_RGBA8;
 			default:
+				std::cout << "Fuck. What type?\n";
 				throw;
 			}
 		}
 		break;
 		default:
+			std::cout << "Fuck. What internal format?\n";
 			throw;
 		}
 	}
