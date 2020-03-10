@@ -3,6 +3,7 @@
 #define GLEW_STATIC 
 #include <GL/glew.h>
 #include <utility>
+#include <iostream>
 #include "error_handling.h"
 
 //#include "src/engine/utils/console.h";
@@ -56,8 +57,15 @@ namespace engine::render::opengl
 
 	void GPUBuffer::write(void * data, i64 offset, i64 bytes) {
 		glBindBuffer(_impl->_type, _impl->_bufferId);
+		// std::cout << "Try to write to GPU buffer with: \noffset = " << offset << "\nsize = " << bytes << std::endl;
 		glBufferSubData(_impl->_type, offset, bytes, data);
-		checkError();
+		// checkError();
+		auto err = glGetError();
+		if (err) {
+			std::cout << "Tried to write to GPU buffer with: \noffset = " << offset << "\nsize = " << bytes << std::endl;
+			std::cerr << "GL error code: 0x" << std::hex << err << std::dec << std::endl;
+			throw;
+		}
 	}
 
 	void GPUBuffer::read(void * output, i64 offset, i64 bytes) {

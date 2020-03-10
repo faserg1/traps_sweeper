@@ -230,7 +230,8 @@ int main(int argc, char* argv[]) {
 
 	auto fpsCounter = FPSCounter{};
 
-	loop.flexStep([&](auto dt, auto ts) {		
+	loop.flexStep([&](auto dt, auto ts) {
+        // std::cout << "Upload batch" << std::endl;		
 		render::upload(batch);
 
 		glClearColor(0.3, 0.3, 0.3, 1.0);
@@ -248,11 +249,13 @@ int main(int argc, char* argv[]) {
 
 			fpsCounter.tick(dt);
 
+			// std::cout << "Upload text batch" << std::endl;	
 			render::upload(textBatch);
 			render::drawWithoutUpload(textBatch, camera);
 
 			glDisable(GL_CULL_FACE);
 
+			// std::cout << "Upload gui batch" << std::endl;	
 			render::upload(guiBatch);
 			render::drawWithoutUpload(guiBatch, guiCamera);
 		}

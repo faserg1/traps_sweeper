@@ -1,6 +1,9 @@
 #include "freetype_font.h"
 #include "utf.h"
 #ifdef EMSCRIPTEN
+#include <fstream>
+#include <new>
+#include <vector>
 #include <ft2build.h>
 #include <ftglyph.h>
 #include "src/engine/environ/emcc_wget.h"
@@ -18,35 +21,17 @@ namespace engine::render {
 
 	struct FreeTypeFont::Impl {
 		Impl(str_ref filePath, i32 pointSize) {
+			std::cout << "Try to load font " << filePath.c_str() << std::endl;
 			if (FT_Init_FreeType(&library)) {
 				std::cerr << "Failed to init freetype" << std::endl;
 				throw;
 			}
-			#ifdef EMSCRIPTEN
-			std::cout << "Try to load file " << filePath.c_str() << std::endl;
-			/*auto fData = env::loadFileAsync(filePath.c_str());
-			if (!fData.valid()) {
-				std::cerr << "Unable to load file!" << std::endl;
-				throw;
-			}
-			auto data = fData.get();*/
-			auto data = env::loadFile(filePath.c_str());
-			auto error = FT_New_Memory_Face(
-				library,
-				static_cast<const unsigned char *>(std::get<0>(*data)),
-				std::get<1>(*data),
-				0,
-				&face
-			);
-			// FT_Error error = 1;
-			#else
 			auto error = FT_New_Face(
 				library,
 				filePath.c_str(),
 				0,
 				&face
 			);
-			#endif
 			if (error) {
 				if (error == FT_Err_Unknown_File_Format) {
 					std::cerr << "Unknown file format." << std::endl;
@@ -77,12 +62,17 @@ namespace engine::render {
 		}
 
 		ImageData renderGlyph(u32 ch) {
-			//if (FT_Load_Char(face, ch, FT_LOAD_DEFAULT)) {
-			if (FT_Load_Char(face, ch, FT_LOAD_FORCE_AUTOHINT)) {
-				throw; 
+			std::cout << "Try to render glyph of char " << ch << std::endl;
+			auto errCode = FT_Load_Char(face, ch, FT_LOAD_FORCE_AUTOHINT);
+			if (errCode) {
+				std::cerr << "Failed to load char " << ch << std::endl;
+				std::cerr << std::hex << "0x" << errCode << std::dec << std::endl;
+				throw;
 			}
-			
-			if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL)) {
+			errCode = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+			if (errCode) {
+				std::cerr << "Failed to render char " << ch << std::endl;
+				std::cerr << std::hex << "0x" << errCode << std::dec << std::endl;
 				throw;
 			}
 

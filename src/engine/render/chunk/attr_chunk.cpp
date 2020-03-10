@@ -5,7 +5,7 @@
 
 #include "../opengl/gl_shader.h"
 #include <vector>
-
+#include <iostream>
 
 namespace engine::render
 {
@@ -16,6 +16,7 @@ namespace engine::render
 		
 		}
 		void init(Layout layout) {
+			_layout = layout;
 			_gpuBuffers.init(layout);
 
 			_uploads._regions.clear();
@@ -44,6 +45,11 @@ namespace engine::render
 				auto bytePerVertex = buf.bytesPerElem();
 				auto offset = r._target.offset*bytePerVertex;
 				auto bytes = r._target.size*bytePerVertex;
+				if (!offset && !bytes) {
+					std::cerr << "There is something strange in region " << r._key << std::endl;
+					auto &errorAttribute = _layout[r._key];
+					std::cerr << "Error at attribute " << errorAttribute.glAttribName << std::endl;
+				}
 				buf._buffer.write(r._data.data(), offset, bytes);
 			}
 
@@ -79,6 +85,7 @@ namespace engine::render
 			std::vector<UploadRegion> _regions = {};
 		};
 
+		Layout _layout;
 		DrawRanges _drawRanges = {};
 		memory::MemAllocator _vertSlots = {65535};
 		memory::MemAllocator _indexSlots = {};

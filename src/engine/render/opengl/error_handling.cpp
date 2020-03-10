@@ -11,7 +11,7 @@ namespace engine::render::opengl
 #else 
 	auto err = glGetError();
 	if (err) {
-		std::cerr << "GL error code: 0x" << std::hex << err << std::oct << " on line " << line << "\n";
+		std::cerr << "GL error code: 0x" << std::hex << err << std::dec << " on line " << line << std::endl;
 		throw;
 	}
 #endif

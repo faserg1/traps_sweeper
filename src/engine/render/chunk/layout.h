@@ -67,6 +67,7 @@ namespace engine::render
 
 		auto begin() const {return _attribs.begin();}
 		auto end() const { return _attribs.end(); }
+		auto size() const {return _attribs.size(); }
 
 		friend bool operator==(const Layout& a, const Layout& b);
 		friend bool operator<(const Layout& a, const Layout& b);
