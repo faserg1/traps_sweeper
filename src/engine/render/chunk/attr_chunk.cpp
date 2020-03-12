@@ -69,6 +69,9 @@ namespace engine::render
 
 			auto& block = uploads._usedBlocks.back();
 			auto v = block->req(bytes);
+			if (!r.offset && !r.size) {
+				std::cerr << "Trying to push new memory range with no size and offset. Why?" << std::endl;
+			}
 			uploads._regions.push_back(Impl::UploadRegion{ index, v, r });
 
 			return v;

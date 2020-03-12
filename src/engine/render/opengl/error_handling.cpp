@@ -7,14 +7,22 @@
 namespace engine::render::opengl
 {
 	void checkError(int line) {
-#ifdef NDEBUG
-#else 
-	auto err = glGetError();
-	if (err) {
-		std::cerr << "GL error code: 0x" << std::hex << err << std::dec << " on line " << line << std::endl;
-		throw;
+		if (hasError(line))
+			throw;
 	}
-#endif
 
+	bool hasError(int line) {
+		#ifdef NDEBUG
+		#else 
+		auto err = glGetError();
+		if (err) {
+			std::cerr << "GL error code: 0x" << std::hex << err << std::dec;
+			if (line >= 0)
+				std::cerr << " on line " << line;
+			std::cerr << std::endl;
+			return true;
+		}
+		#endif
+		return false;
 	}
 }

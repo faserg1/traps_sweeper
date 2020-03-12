@@ -249,13 +249,11 @@ int main(int argc, char* argv[]) {
 
 			fpsCounter.tick(dt);
 
-			// std::cout << "Upload text batch" << std::endl;	
 			render::upload(textBatch);
 			render::drawWithoutUpload(textBatch, camera);
 
 			glDisable(GL_CULL_FACE);
 
-			// std::cout << "Upload gui batch" << std::endl;	
 			render::upload(guiBatch);
 			render::drawWithoutUpload(guiBatch, guiCamera);
 		}

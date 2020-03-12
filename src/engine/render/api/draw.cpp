@@ -35,14 +35,14 @@ namespace engine::render {
 		//chunk.upload();
 		shader.use();
 		shader.setAttribs(chunk);
-		opengl::checkError();
+		opengl::checkError(__LINE__);
 		auto& ranges = chunk.drawRanges();
 		auto drawn = 0;
 		for (auto r : ranges) {
 			//TODO: u32 indices?
 			glDrawElements(GL_TRIANGLES, r.end - r.start, GL_UNSIGNED_SHORT, (void *)(r.start * sizeof(u16)));
 			drawn += r.end - r.start;
-			opengl::checkError();
+			opengl::checkError(__LINE__);
 		}
 		return drawn / 3;
 	}

@@ -83,10 +83,13 @@ namespace engine::render {
 
 	void TextSprite::setText(str_ref text)
 	{
+		if (text.empty())
+			return;
 		auto utfs = ext::utf::UTF8Stream(text.c_str());
 		auto count = utfs.count();
 		auto vCount = count * 4;
 		auto iCount = count * 6;
+		std::cout << "Setting text \"" << text << "\". UTF8 data count: " << count << std::endl;
 
 		if (this->_meshes.size() == 0 || this->_meshes[0].dataPtr.vCount() < vCount) {
 			this->_meshes.clear();

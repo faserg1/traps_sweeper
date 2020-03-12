@@ -236,6 +236,8 @@ namespace engine::render::opengl
 			auto& name = s.glAttribName;
 			if (s.isIndices) {
 				b._buffer.use(); // bind indices
+				// Hack. Do better
+				glDisableVertexAttribArray(3);
 				continue;
 			}
 			if (!this->hasAttrib(name)) { 

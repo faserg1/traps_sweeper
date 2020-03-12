@@ -62,7 +62,6 @@ namespace engine::render {
 		}
 
 		ImageData renderGlyph(u32 ch) {
-			std::cout << "Try to render glyph of char " << ch << std::endl;
 			auto errCode = FT_Load_Char(face, ch, FT_LOAD_FORCE_AUTOHINT);
 			if (errCode) {
 				std::cerr << "Failed to load char " << ch << std::endl;
