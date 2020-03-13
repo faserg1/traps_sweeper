@@ -57,7 +57,6 @@ namespace engine::render::opengl
 
 	void GPUBuffer::write(void * data, i64 offset, i64 bytes) {
 		glBindBuffer(_impl->_type, _impl->_bufferId);
-		// std::cout << "Try to write to GPU buffer with: \noffset = " << offset << "\nsize = " << bytes << std::endl;
 		glBufferSubData(_impl->_type, offset, bytes, data);
 		// checkError();
 		auto err = glGetError();

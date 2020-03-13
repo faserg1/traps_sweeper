@@ -230,8 +230,7 @@ int main(int argc, char* argv[]) {
 
 	auto fpsCounter = FPSCounter{};
 
-	loop.flexStep([&](auto dt, auto ts) {
-        // std::cout << "Upload batch" << std::endl;		
+	loop.flexStep([&](auto dt, auto ts) {	
 		render::upload(batch);
 
 		glClearColor(0.3, 0.3, 0.3, 1.0);
@@ -267,9 +266,7 @@ int main(int argc, char* argv[]) {
 		window.swapBuffer();
 
 	});
-	std::cout << "Before loop" << std::endl;
 	loop.start();
-	std::cout << "After loop" << std::endl;
 	return 0;
 }
 

@@ -21,7 +21,6 @@ namespace engine::render {
 
 	struct FreeTypeFont::Impl {
 		Impl(str_ref filePath, i32 pointSize) {
-			std::cout << "Try to load font " << filePath.c_str() << std::endl;
 			if (FT_Init_FreeType(&library)) {
 				std::cerr << "Failed to init freetype" << std::endl;
 				throw;

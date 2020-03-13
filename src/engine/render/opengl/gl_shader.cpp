@@ -46,19 +46,13 @@ namespace engine::render::opengl
 			glGetShaderiv(shader, GL_COMPILE_STATUS, &shaderCompiled);
 			if (shaderCompiled != GL_TRUE)
 			{
-				std::cout << "Unable to compile shader " << shader << "\n";
-				
 				i32 charLength = 0;
 				glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &charLength);
 
 				str_t str = "";
 				str.reserve(charLength);
 				glGetShaderInfoLog(shader, charLength, NULL, &str[0]);
-
-				std::cout << str.c_str() << "\n";
-				std::cout << *source << std::endl;
 				throw;
-				return 0;
 			}
 			checkError();
 			return shader;
@@ -82,7 +76,7 @@ namespace engine::render::opengl
 			glGetProgramiv(program, GL_LINK_STATUS, &programSuccess);
 			if (programSuccess != GL_TRUE)
 			{
-				std::cout << "Error linking program " << program << "\n";
+				std::cerr << "Error linking program " << program << "\n";
 
 				int charLength = 0;
 
@@ -100,7 +94,6 @@ namespace engine::render::opengl
 					std::cout << str.c_str() << "\n";
 				}
 				throw;
-				return 0;
 			}
 			else {
 				return program;
@@ -230,20 +223,26 @@ namespace engine::render::opengl
 		// chunk must be uploaded before this is called (due to lazy initialization)
 		auto& gpuBuffers = chunk.getGPUBuffers();
 		use();
+
+		// Hack. Do better
+		constexpr auto WRONG_MAX_HAXX = 8;
+		for (auto iLoc = 0; iLoc < WRONG_MAX_HAXX; iLoc++) {
+			glDisableVertexAttribArray(iLoc);
+		}
+
 		for (auto& b : gpuBuffers) {
 			auto& s = b._settings;
 			auto& buf = b._buffer;
 			auto& name = s.glAttribName;
 			if (s.isIndices) {
 				b._buffer.use(); // bind indices
-				// Hack. Do better
-				glDisableVertexAttribArray(3);
 				continue;
 			}
 			if (!this->hasAttrib(name)) { 
 				continue;
 			}
 			auto loc = _impl->_attribs[name].location;
+			glEnableVertexAttribArray(loc);
 			b._buffer.use();
 			glVertexAttribPointer(
 				loc,

@@ -8,12 +8,10 @@
 namespace engine::render {
 	void upload(AttrChunk& chunk)
 	{
-		// std::cout << "Chunk upload" << std::endl;
 		chunk.upload();
 	}
 	void upload(DrawBatch& batch)
 	{
-		// std::cout << "Batch upload" << std::endl;
 		batch.upload();
 	}
 }
