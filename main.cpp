@@ -44,6 +44,7 @@
 #include <cassert>
 #include <tuple>
 #include <filesystem>
+#include <functional>
 
 namespace fs = std::filesystem;
 
@@ -176,7 +177,7 @@ int main(int argc, char* argv[]) {
 	minesLeft->textSettings().color = { 255,0,0,255 };
 	minesLeft->setText(std::to_string(boardState.getMinesLeft()));
 
-	board.setCallback([&](sweeper::Coord coord) {
+	board.setCallback(std::function<void(sweeper::Coord coord)>([&](sweeper::Coord coord) {
 		fmt::print("{},{},{},\n", coord.x, coord.y, boardState.getProgress());
 		if (cursor.button == cursor.LEFT) {
 			boardState.explore(coord, true);
@@ -184,11 +185,10 @@ int main(int argc, char* argv[]) {
 		else if (cursor.button == cursor.RIGHT) {
 			boardState.mark(coord);
 		}
-		
 		board.refresh(boardState);
 		minesLeft->setText(std::to_string(boardState.getMinesLeft()));
 		pic.setProgress(boardState.getProgress() == 1.0f ? 1.0f : 0.05f + boardState.getProgress() * 0.55f);
-	});
+	}));
 
 	fac.makeSimpleButton(
 		sweeperFrame,
@@ -267,7 +267,9 @@ int main(int argc, char* argv[]) {
 		window.swapBuffer();
 
 	});
+	std::cout << "Before loop" << std::endl;
 	loop.start();
+	std::cout << "After loop" << std::endl;
 	return 0;
 }
 

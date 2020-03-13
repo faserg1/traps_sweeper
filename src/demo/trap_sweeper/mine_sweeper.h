@@ -2,7 +2,7 @@
 #include <array>
 #include "src/engine/gui/simple_button.h"
 #include "src/ext/math.h"
-#include "src/ext/functional.h"
+#include <functional>
 
 namespace sweeper {
 	using namespace engine;
@@ -232,7 +232,8 @@ namespace sweeper {
 
 	template <i32 W, i32 H>
 	class BoardButtons {
-		using Callback_T = FnRef<void(Coord)>;
+		//using Callback_T = FnRef<void(Coord)>;
+		using Callback_T = std::function<void(Coord)>;
 	public:
 		BoardButtons(gui::Factory& fac, std::shared_ptr<gui::Frame>& parent, gui::Vec2 offset, Callback_T callback = {}) {
 			// some hard coded values...
