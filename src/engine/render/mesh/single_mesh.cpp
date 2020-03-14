@@ -26,7 +26,7 @@ namespace engine::render
 		static i64 getOffset(i32 count) {
 			static_assert(compile_time::contains<Target, Ts...>(), "Error: Type not found.");
 			static_assert(compile_time::countSame<Target, Ts...>() == 1, "Error: sequense has same types.");
-			return getOffsetImpl() * count;
+			return getOffsetImpl<Target>() * count;
 		}
 	private:
 		template <typename Target>
