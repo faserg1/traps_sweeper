@@ -22,30 +22,23 @@ namespace engine::render
 		static i64 totalSize(i32 count) {
 			return (Ts::size() + ...) * count;
 		}
-		template <typename T>
+		template <typename Target>
 		static i64 getOffset(i32 count) {
-			static_assert(compile_time::contains<T, Ts...>(), "Error: Type not found.");
-			return getOffsetImpl<T, Ts...>() * count;
+			static_assert(compile_time::contains<Target, Ts...>(), "Error: Type not found.");
+			static_assert(compile_time::countSame<Target, Ts...>() == 1, "Error: sequense has same types.");
+			struct {
+				i64 size;
+				bool isTarget;
+			} allSizes[sizeof...(Ts)] = {{Ts::size(), std::is_same_v<Target, Ts>}...};
+			i64 offset = 0;
+			for (auto &size : allSizes) {
+				if (size.isTarget)
+					break;
+				offset += size.size;
+			}
+			return offset * count;
 		}
 	private:
-		/*template <typename T, typename... Ts>
-		constexpr static i64 totalSizeImpl(i64 size = 0) {
-			size += T::size();
-			if constexpr (sizeof...(Ts) > 0) {
-				return totalSizeImpl<Ts...>(size);
-			}
-			else {
-				return size;
-			}
-		}*/
-		template <typename Target, typename T, typename... Ts2>
-		constexpr static i64 getOffsetImpl(i64 offset = 0) {
-			if constexpr (std::is_same_v<Target, T>) { return offset; }
-			else {
-				offset += T::size();
-				return getOffsetImpl<Target, Ts2...>(offset);
-			}
-		}
 	};
 
 	class Pos : public TypeImpl<f32, 3> {};

@@ -10,6 +10,21 @@ namespace engine::compile_time
 	constexpr i32 count() {
 		return static_cast<i32>(sizeof...(Ts));
 	}
+
+	template<typename T1, typename T2>
+	constexpr i32 is_same_v_i32 = std::is_same_v<T1, T2> ? 1 : 0;
+
+	template<i32 ... seq>
+	constexpr i32 sum() {
+		return (seq + ...);
+	}
+
+	template <typename Target, typename... Ts>
+	constexpr i32 countSame() {
+		
+		auto countSameTs = sum<is_same_v_i32<Target, Ts>...>();
+		return static_cast<i32>(countSameTs);
+	}
 	
 	template <typename T, typename... Ts>
 	constexpr bool contains() {
