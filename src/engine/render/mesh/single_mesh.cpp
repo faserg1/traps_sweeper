@@ -26,6 +26,11 @@ namespace engine::render
 		static i64 getOffset(i32 count) {
 			static_assert(compile_time::contains<Target, Ts...>(), "Error: Type not found.");
 			static_assert(compile_time::countSame<Target, Ts...>() == 1, "Error: sequense has same types.");
+			return getOffsetImpl() * count;
+		}
+	private:
+		template <typename Target>
+		constexpr static i64 getOffsetImpl() {
 			struct {
 				i64 size;
 				bool isTarget;
@@ -36,9 +41,8 @@ namespace engine::render
 					break;
 				offset += size.size;
 			}
-			return offset * count;
+			return offset;
 		}
-	private:
 	};
 
 	class Pos : public TypeImpl<f32, 3> {};
