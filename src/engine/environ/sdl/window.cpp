@@ -29,16 +29,13 @@ namespace engine::sdl
 		
 		#ifdef EMSCRIPTEN
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-		// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		int major, minor;
 		SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major);
 		SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
 		
-		std::cout << "The max version is " << major << "." << minor << ".\n";
+		std::cout << "The current version is " << major << "." << minor << ".\n";
 		
-		std::cout << "Set version" << std::endl;
-		// Request a debug context.
-		// SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+		std::cout << "Set version 3.0" << std::endl;
 		
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
