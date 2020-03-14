@@ -129,7 +129,8 @@ namespace engine::render
 
 	void AttrChunk::dispose(const ChunkPointer& ptr)
 	{
-		if (!ptr) { return; }
+		if (!ptr)
+			return; 
 		_impl->_vertSlots.freeRoom(ptr._vSeg);
 		_impl->_indexSlots.freeRoom(ptr._iSeg);
 		_impl->_drawRanges.remove(ptr._iSeg.offset, ptr._iSeg.offset + ptr._iSeg.size); 

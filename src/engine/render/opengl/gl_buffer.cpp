@@ -39,7 +39,8 @@ namespace engine::render::opengl
 	}
 
 	void GPUBuffer::resize(i64 newSize) {
-		if (newSize <= _impl->_size) { return; }
+		if (newSize <= _impl->_size)
+			return;
 		if (_impl->_size == 0) {
 			glGenBuffers(1, &(_impl->_bufferId));
 			glBindBuffer(_impl->_type, _impl->_bufferId);
@@ -47,9 +48,17 @@ namespace engine::render::opengl
 			checkError();
 		}
 		else {
-			glBindBuffer(_impl->_type, _impl->_bufferId);
-            glBufferData(_impl->_type, newSize, nullptr, GL_STATIC_DRAW);
-            checkError();
+			GLuint newBuffer = 0;
+			glGenBuffers(1, &newBuffer);
+			glBindBuffer(_impl->_type, newBuffer);
+			glBufferData(_impl->_type, newSize, nullptr, GL_STATIC_DRAW);
+			glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer);
+			glBufferData(GL_COPY_WRITE_BUFFER, newSize, nullptr, GL_STATIC_DRAW);
+			glBindBuffer(GL_COPY_READ_BUFFER, _impl->_bufferId);
+			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, _impl->_size);
+			glDeleteBuffers(1, &(_impl->_bufferId));
+			checkError();
+			_impl->_bufferId = newBuffer;
 			//console::out("glBuffer resized");
 		}
 		_impl->_size = newSize;

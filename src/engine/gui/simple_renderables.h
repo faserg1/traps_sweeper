@@ -55,7 +55,11 @@ namespace engine::gui {
 
 		void setText(str_ref text) {
 			_text.setText(text);
-			updateTransforms();
+			if (!text.empty()) {
+				updateTransforms();
+			} else {
+				setVis(false);
+			}
 		}
 
 		render::TextSprite::TextSettings& textSettings() {
