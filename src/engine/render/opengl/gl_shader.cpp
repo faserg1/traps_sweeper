@@ -11,6 +11,7 @@
 #include "defines/gl_type_enums.h"
 #include "error_handling.h"
 
+#include "src/engine/render/opengl/gl_enabled_attributes.h"
 #include "src/engine/render/chunk/attr_chunk.h"
 #include "src/engine/render/chunk/impl/gpu_buffers.h"
 #include "gl_texture.h"
@@ -115,8 +116,6 @@ namespace engine::render::opengl
 			for (GLuint i = 0; i < static_cast<GLuint>(count); ++i) {
 				glGetActiveAttrib(_program, i, bufSize, &length, &size, &type, name);
 				GLuint location = glGetAttribLocation(_program, name);
-				glEnableVertexAttribArray(location);
-
 				_attribs[name] = VarInfo{ name, location, type };
 			}
 
@@ -224,11 +223,7 @@ namespace engine::render::opengl
 		auto& gpuBuffers = chunk.getGPUBuffers();
 		use();
 
-		// Hack. Do better
-		constexpr auto WRONG_MAX_HAXX = 8;
-		for (auto iLoc = 0; iLoc < WRONG_MAX_HAXX; iLoc++) {
-			glDisableVertexAttribArray(iLoc);
-		}
+		opengl::disableAllVertexAttribArray();
 
 		for (auto& b : gpuBuffers) {
 			auto& s = b._settings;
@@ -242,7 +237,7 @@ namespace engine::render::opengl
 				continue;
 			}
 			auto loc = _impl->_attribs[name].location;
-			glEnableVertexAttribArray(loc);
+			opengl::enableVertexAttribArray(loc);
 			b._buffer.use();
 			glVertexAttribPointer(
 				loc,
