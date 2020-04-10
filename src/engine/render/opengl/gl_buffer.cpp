@@ -60,7 +60,6 @@ namespace engine::render::opengl
 			glGenBuffers(1, &newBuffer);
 			glBindBuffer(_impl->_type, newBuffer);
 			glBufferData(_impl->_type, newSize, nullptr, GL_STATIC_DRAW);
-			std::cerr << "Major version is: " << _impl->_majorVer << std::endl;
 			if (_impl->_majorVer > 2) {
 				glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer);
 				glBufferData(GL_COPY_WRITE_BUFFER, newSize, nullptr, GL_STATIC_DRAW);

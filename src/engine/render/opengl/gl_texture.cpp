@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 #include "error_handling.h"
 #include <cassert>
+#include <cmath>
 #include <iostream>
 
 //#include "src/engine/utils/console.h"
@@ -23,6 +24,8 @@ namespace engine::render::opengl
 		TextureParams _params = {};
 		i32 _w = 0;
 		i32 _h = 0;
+		//i32 _readlW = 0;
+		//i32 _realH = 0;
 		bool _dirty = true;
 		GLint (*const getInternalFormat)(DataType type, TextureParams::Format format);
 
@@ -45,8 +48,14 @@ namespace engine::render::opengl
 	GPUTexture::GPUTexture(GPUTexture &&) noexcept = default;
 	GPUTexture & GPUTexture::operator=(GPUTexture &&) noexcept = default;
 
-	bool is_power_of_2(int x) {
+	bool isPowerOf2(int x) {
 		return x > 0 && !(x & (x - 1));
+	}
+
+	auto nextPowerOf2(unsigned num) {
+		num = num - 1;
+		unsigned lg = log2(num);
+		return 1U << (lg + 1);
 	}
 
 	GLenum toGLEnum(TextureParams::Format format) {
@@ -148,6 +157,10 @@ namespace engine::render::opengl
 				params.magFilter = params.LINEAR;
 				// magFilter can only be NEAREST OR LINEAR!
 			}
+			// Webgl1 / OpenGL ES 2 support
+			if (!isPowerOf2(_impl->_w) || !isPowerOf2(_impl->_h)) {
+				params.minFilter = params.LINEAR;
+			}
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, toFilterEnum(params.minFilter));
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, toFilterEnum(params.magFilter));
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, toWrapEnum(params.wrapS));
@@ -155,8 +168,7 @@ namespace engine::render::opengl
 
 			checkError(3);
 
-			if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST
-				&& is_power_of_2(_impl->_w) && is_power_of_2(_impl->_h)) {
+			if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST) {
 				glGenerateMipmap(GL_TEXTURE_2D);
 			}
 			checkError(4);
@@ -168,6 +180,8 @@ namespace engine::render::opengl
 	{
 		_impl->_w = w;
 		_impl->_h = h;
+		//_impl->_readlW = nextPowerOf2(w);
+		//_impl->_realH = nextPowerOf2(h);
 		auto& params = _impl->_params;
 		this->use();
 
@@ -179,15 +193,14 @@ namespace engine::render::opengl
 			GL_TEXTURE_2D,
 			0,
 			internalFormat,
-			w,
-			h,
+			_impl->_w,
+			_impl->_h,
 			0,
 			format,
 			type,
 			nullptr
 		);
-		if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST
-		 && is_power_of_2(w) && is_power_of_2(h)) {
+		if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST) {
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		checkError();
@@ -218,8 +231,7 @@ namespace engine::render::opengl
 			toGLEnum(params.dataType),
 			bytes
 		);
-		if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST
-			&& is_power_of_2(w) && is_power_of_2(h)) {
+		if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST) {
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		checkError();
