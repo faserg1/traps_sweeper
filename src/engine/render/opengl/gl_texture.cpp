@@ -1,4 +1,5 @@
 #include "gl_texture.h"
+#include "gl_context_info.h"
 #include "defines/gl_type_enums.h"
 
 #define GLEW_STATIC 
@@ -11,17 +12,23 @@
 
 namespace engine::render::opengl
 {
+	GLenum toGLEnum(TextureParams::Format format);
+	GLint toFilterEnum(TextureParams::Filter filter);
+	GLint toWrapEnum(TextureParams::Wrap warp);
+	GLint getInternalFormatES2(DataType type, TextureParams::Format format);
+	GLint getInternalFormatES3(DataType type, TextureParams::Format format);
+
 	struct GPUTexture::Impl {
 		GLuint _texture = 0;
 		TextureParams _params = {};
 		i32 _w = 0;
 		i32 _h = 0;
 		bool _dirty = true;
+		GLint (*const getInternalFormat)(DataType type, TextureParams::Format format);
 
-		Impl() {
+		Impl(): getInternalFormat(getMajorVersion() == 3 ? &getInternalFormatES3 : &getInternalFormatES2) {
 			glGenTextures(1, &_texture);
 			//console::out(std::to_string(_texture));
-			//checkError();
 		}
 		~Impl() {
 			if (_texture != 0) {// spec ignores 0s so this isnt technically neccessary, but why the heck not
@@ -80,7 +87,17 @@ namespace engine::render::opengl
 		}
 	}
 
-	GLint getInternalFormat(DataType type, TextureParams::Format format) {
+	GLint getInternalFormatES2(DataType type, TextureParams::Format format) {
+		switch (format) {
+		case TextureParams::Format::RGBA:
+			return GL_RGBA;
+		default:
+			std::cerr << "What internal format?\n";
+			throw;
+		}
+	}
+
+	GLint getInternalFormatES3(DataType type, TextureParams::Format format) {
 		switch (format) {
 		case TextureParams::Format::RGBA:
 		{
@@ -141,28 +158,30 @@ namespace engine::render::opengl
 
 	void GPUTexture::resizeAndClear(i32 w, i32 h) // clears data!
 	{
-		checkError(1);
-		//console::out("texture resize");
 		_impl->_w = w;
 		_impl->_h = h;
 		auto& params = _impl->_params;
 		this->use();
+
+		auto internalFormat = _impl->getInternalFormat(params.dataType, params.format);
+		auto format = toGLEnum(params.format);
+		auto type = toGLEnum(params.dataType);
+		
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
-			getInternalFormat(params.dataType, params.format),
+			internalFormat,
 			w,
 			h,
 			0,
-			toGLEnum(params.format),
-			toGLEnum(params.dataType),
+			format,
+			type,
 			nullptr
 		);
-		checkError(2);
 		if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST) {
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
-		checkError(3);
+		checkError();
 	}
 	void GPUTexture::write(const byte* bytes)
 	{
@@ -174,6 +193,11 @@ namespace engine::render::opengl
 		checkError();
 		this->use();
 		auto& params = _impl->_params;
+
+		auto internalFormat = _impl->getInternalFormat(params.dataType, params.format);
+		auto format = toGLEnum(params.format);
+		auto type = toGLEnum(params.dataType);
+
 		glTexSubImage2D(
 			GL_TEXTURE_2D,
 			0,

@@ -52,10 +52,10 @@ namespace engine::render::opengl
 			glGenBuffers(1, &newBuffer);
 			glBindBuffer(_impl->_type, newBuffer);
 			glBufferData(_impl->_type, newSize, nullptr, GL_STATIC_DRAW);
-			glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer);
-			glBufferData(GL_COPY_WRITE_BUFFER, newSize, nullptr, GL_STATIC_DRAW);
-			glBindBuffer(GL_COPY_READ_BUFFER, _impl->_bufferId);
-			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, _impl->_size);
+			//glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer);
+			//glBufferData(GL_COPY_WRITE_BUFFER, newSize, nullptr, GL_STATIC_DRAW);
+			//glBindBuffer(GL_COPY_READ_BUFFER, _impl->_bufferId);
+			//glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, _impl->_size);
 			glDeleteBuffers(1, &(_impl->_bufferId));
 			checkError();
 			_impl->_bufferId = newBuffer;

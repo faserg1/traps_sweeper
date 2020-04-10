@@ -27,18 +27,19 @@ namespace engine::sdl
 		auto flags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
 		#endif
 		
+		int major, minor;
+
 		#ifdef EMSCRIPTEN
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-		int major, minor;
+		
 		SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major);
 		SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
 		
 		std::cout << "The current version is " << major << "." << minor << ".\n";
 		
-		std::cout << "Set version 3.0" << std::endl;
-		
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+		//std::cout << "Set version 3.0" << std::endl;
+		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 		#else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		#endif
