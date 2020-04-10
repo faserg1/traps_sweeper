@@ -45,6 +45,10 @@ namespace engine::render::opengl
 	GPUTexture::GPUTexture(GPUTexture &&) noexcept = default;
 	GPUTexture & GPUTexture::operator=(GPUTexture &&) noexcept = default;
 
+	bool is_power_of_2(int x) {
+		return x > 0 && !(x & (x - 1));
+	}
+
 	GLenum toGLEnum(TextureParams::Format format) {
 		switch (format) {
 		case TextureParams::Format::RGBA:
@@ -131,8 +135,9 @@ namespace engine::render::opengl
 
 	void GPUTexture::use()
 	{
-		checkError();
+		checkError(1);
 		glBindTexture(GL_TEXTURE_2D, _impl->_texture);
+		checkError(2);
 		if (_impl->_dirty) {
 			auto& params = _impl->_params;
 			if (params.magFilter == params.LINEAR_MIPMAP_LINEAR
@@ -148,10 +153,13 @@ namespace engine::render::opengl
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, toWrapEnum(params.wrapS));
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, toWrapEnum(params.wrapT));
 
-			if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST) {
+			checkError(3);
+
+			if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST
+				&& is_power_of_2(_impl->_w) && is_power_of_2(_impl->_h)) {
 				glGenerateMipmap(GL_TEXTURE_2D);
 			}
-			checkError();
+			checkError(4);
 			_impl->_dirty = false;
 		}
 	}
@@ -178,7 +186,8 @@ namespace engine::render::opengl
 			type,
 			nullptr
 		);
-		if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST) {
+		if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST
+		 && is_power_of_2(w) && is_power_of_2(h)) {
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		checkError();
@@ -209,7 +218,8 @@ namespace engine::render::opengl
 			toGLEnum(params.dataType),
 			bytes
 		);
-		if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST) {
+		if (params.minFilter != params.LINEAR && params.minFilter != params.NEAREST
+			&& is_power_of_2(w) && is_power_of_2(h)) {
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		checkError();
