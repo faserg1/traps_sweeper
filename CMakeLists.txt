@@ -35,7 +35,7 @@ target_link_libraries(App fmt::fmt-header-only)
 
 target_compile_options(App PRIVATE "-std=c++17")
 target_compile_options(App PRIVATE "-O3")
-#target_compile_options(App PRIVATE "-DNDEBUG")
+target_compile_options(App PRIVATE "-DNDEBUG")
 target_compile_options(App PRIVATE "-g4")
 target_compile_options(App PRIVATE "-s\ " "WASM=1")
 target_compile_options(App PRIVATE "-s\  " "USE_SDL=2")

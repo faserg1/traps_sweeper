@@ -4,7 +4,9 @@
 #include <GL/glew.h>
 #include <utility>
 #include <iostream>
+#include <vector>
 #include "error_handling.h"
+#include "gl_context_info.h"
 
 //#include "src/engine/utils/console.h";
 
@@ -15,8 +17,11 @@ namespace engine::render::opengl
 		i32 _size = 0;
 		GLuint _bufferId = 0;
 		GLuint _type = 0;
+		// Used for webgl1 buffer copy
+		std::vector<byte> _memBuffer;
+		const int _majorVer;
 
-		Impl() {};
+		Impl() : _majorVer(getMajorVersion()) {};
 		~Impl() {
 			glDeleteBuffers(1, &_bufferId);
 		}
@@ -46,20 +51,28 @@ namespace engine::render::opengl
 			glBindBuffer(_impl->_type, _impl->_bufferId);
 			glBufferData(_impl->_type, newSize, nullptr, GL_STATIC_DRAW);
 			checkError();
+			if (_impl->_majorVer == 2) {
+				_impl->_memBuffer.resize(newSize);
+			}
 		}
 		else {
 			GLuint newBuffer = 0;
 			glGenBuffers(1, &newBuffer);
 			glBindBuffer(_impl->_type, newBuffer);
 			glBufferData(_impl->_type, newSize, nullptr, GL_STATIC_DRAW);
-			//glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer);
-			//glBufferData(GL_COPY_WRITE_BUFFER, newSize, nullptr, GL_STATIC_DRAW);
-			//glBindBuffer(GL_COPY_READ_BUFFER, _impl->_bufferId);
-			//glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, _impl->_size);
+			std::cerr << "Major version is: " << _impl->_majorVer << std::endl;
+			if (_impl->_majorVer > 2) {
+				glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer);
+				glBufferData(GL_COPY_WRITE_BUFFER, newSize, nullptr, GL_STATIC_DRAW);
+				glBindBuffer(GL_COPY_READ_BUFFER, _impl->_bufferId);
+				glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, _impl->_size);
+			} else {
+				glBufferSubData(_impl->_type, 0, _impl->_memBuffer.size(), _impl->_memBuffer.data());
+				_impl->_memBuffer.resize(newSize);
+			}
 			glDeleteBuffers(1, &(_impl->_bufferId));
 			checkError();
 			_impl->_bufferId = newBuffer;
-			//console::out("glBuffer resized");
 		}
 		_impl->_size = newSize;
 	}
@@ -74,9 +87,15 @@ namespace engine::render::opengl
 			std::cerr << "GL error code: 0x" << std::hex << err << std::dec << std::endl;
 			throw;
 		}
+		if (_impl->_majorVer == 2) {	
+			memcpy(_impl->_memBuffer.data() + offset, data, bytes);
+		}
 	}
 
 	void GPUBuffer::read(void * output, i64 offset, i64 bytes) {
+		// Should not used in release
+		if (getMajorVersion() == 2)
+			throw;
 		glBindBuffer(_impl->_type, _impl->_bufferId);
 		glGetBufferSubData(_impl->_type, offset, bytes, output);
 		checkError();
